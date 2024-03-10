@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Filters;
+using WebAPI.Filters.ExceptionFilters;
 using WebAPI.Models;
 using WebAPI.Models.Repositories;
 
@@ -48,11 +49,9 @@ namespace WebAPI.Controllers
         //? LEE EL CONTENIDO DEL BODY DE LA PETICION 
 
         [HttpPost]
+        [Shirt_ValidateCreateShirtFilter]
         public IActionResult CreateShirt([FromBody] Shirt shirt)
         {
-            if (shirt == null) return BadRequest();
-            var existingShirt = ShirtRepository.GetShirtByProperties(shirt.Brand, shirt.Gender, shirt.Color, shirt.Size);
-            if (existingShirt != null) return BadRequest();
 
             ShirtRepository.AddShirt(shirt);
             return CreatedAtAction(nameof(GetShirtsById),
@@ -72,15 +71,23 @@ namespace WebAPI.Controllers
         // }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateShirt(int id)
+        [Shirt_ValidateCreateShirtFilter]
+        [Shirt_ValidateUpdateShirtFilter]
+        [Shirt_HandleUpdateExceptionsFilter]
+        public IActionResult UpdateShirt(int id, Shirt shirt)
         {
-            return Ok($"Updating the shirt with ID: {id}");
+            ShirtRepository.UpdateShirt(shirt);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
+        [Shirt_ValidateShirtIdFilter]
         public IActionResult DeleteShirt(int id)
         {
-            return Ok($"Deleting the shirt with ID: {id}");
+            var shirt = ShirtRepository.GetShirtById(id);
+            ShirtRepository.DeleteShirt(id);
+
+            return Ok(shirt);
         }
 
     }

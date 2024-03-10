@@ -22,6 +22,15 @@ namespace WebAPI.Models.Repositories
             shirt.ShirtId = maxId + 1;
             shirts.Add(shirt);
         }
+        public static void UpdateShirt(Shirt shirt)
+        {
+            var shirtToUpdate = shirts.First(x => x.ShirtId == shirt.ShirtId);
+            shirtToUpdate.Brand = shirt.Brand;
+            shirtToUpdate.Size = shirt.Size;
+            shirtToUpdate.Price = shirt.Price;
+            shirtToUpdate.Color = shirt.Color;
+            shirtToUpdate.Gender = shirt.Gender;
+        }
         public static List<Shirt> GetShirts()
         {
             return shirts;
@@ -49,6 +58,15 @@ namespace WebAPI.Models.Repositories
                 size.HasValue &&
                 shirt.Size.HasValue &&
                 size.Value == shirt.Size.Value);
+        }
+
+        public static void DeleteShirt(int shirtId)
+        {
+            var shirt = GetShirtById(shirtId);
+            if (shirt != null)
+            {
+                shirts.Remove(shirt);
+            }
         }
     }
 }
